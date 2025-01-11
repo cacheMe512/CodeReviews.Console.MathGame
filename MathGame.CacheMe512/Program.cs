@@ -8,9 +8,9 @@ string[] operations = { "+", "-", "*", "/" };
 List<string> games = new List<string>();
 List<(string Difficulty, int Min, int Max)> difficultyLevels = new List<(string, int, int)>
 {
-    ("Easy", 1, 10),
-    ("Normal", 5, 20),
-    ("Hard", 10, 50)
+    ("Easy", 0, 20),
+    ("Normal", 0, 50),
+    ("Hard", 0, 100)
 };
 (string Difficulty, int Min, int Max) currentDifficulty = difficultyLevels[1];
 
@@ -71,6 +71,7 @@ while (!exit)
         {
             try
             {
+                Console.Clear();
                 if(menuSelection == 5)
                     equation = GetRandomEquation();
                 else
@@ -126,6 +127,18 @@ string GetEquation(string operation)
         int min = currentDifficulty.Min;
         int max = currentDifficulty.Max;
 
+        if (operation == "/")
+        {
+            int divisor = random.Next(min, max);
+            if (divisor == 0) divisor = 1;
+
+            int maxDividend = max / divisor;
+            if (maxDividend < min) maxDividend = min;
+
+            int dividend = divisor * random.Next(min, maxDividend + 1);
+            return $"{dividend} {operation} {divisor}";
+        }
+
         return $"{random.Next(min, max)} {operation} {random.Next(min, max)}";
     }
     catch (Exception ex)
@@ -134,6 +147,7 @@ string GetEquation(string operation)
         throw;
     }
 }
+
 
 string GetRandomEquation()
 {
@@ -149,8 +163,11 @@ string GetRandomEquation()
         int operand2 = randomOperand.Next(min, max);
         string operation = operations[randomOperation.Next(4)];
 
-        if(operation == "/" && operand2 == 0)
-            operand2 = randomOperand.Next(1, max);
+        if(operation == "/")
+        {
+            if(operand2 == 0) operand2 = 1;
+            operand1 = operand2 * randomOperand.Next(min, max / operand2);
+        }
 
         return $"{operand1} {operation} {operand2}";
     }
